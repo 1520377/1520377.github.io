@@ -1,0 +1,21 @@
+name: pwa
+on:
+  push:
+    paths:
+      - '.github/workflows/pwa.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: patch
+        run: python3 tools/patch_pwa.py
+      - name: commit
+        run: |
+          git config user.name "doubao-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git commit -m "add pwa manifest, icons and service worker"
+          git push
