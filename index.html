@@ -212,6 +212,9 @@ select option{background:var(--card)}
 .rec .r{display:flex;align-items:center;justify-content:flex-end}
 
 </style>
+<meta name="theme-color" content="#12100D">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 
@@ -1596,5 +1599,6 @@ window.addEventListener('load',function(){
 window.addEventListener('DOMContentLoaded',function(){ init(); });
 
 </script>
+<script>if("serviceWorker" in navigator && location.protocol === "https:"){addEventListener("load",function(){navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){});});}</script>
 </body>
 </html>
