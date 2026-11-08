@@ -103,8 +103,10 @@ HEAD_BLOCK = (
     '<link rel="apple-touch-icon" href="icon-192.png">\n'
 )
 
-BODY_BLOCK = (
-    '<script>if("serviceWorker" in navigator && location.protocol === "https:"){' \n    
+SW_BLOCK = (
+    '<script>if("serviceWorker" in navigator && location.protocol === "https:"){'
+    'addEventListener("load",function(){navigator.serviceWorker.register("sw.js",{scope:"./"})'
+    '.catch(function(){});});}</script>\n'
 )
 
 
@@ -120,13 +122,10 @@ def main():
             raise SystemExit("no head/body marker, abort")
         anchor = "</head>" if "</head>" in html else "<body"
         html = html.replace(anchor, HEAD_BLOCK + anchor, 1)
-        sw = ('<script>if("serviceWorker" in navigator && location.protocol === "https:"){'
-              'addEventListener("load",function(){navigator.serviceWorker.register("sw.js",{scope:"./"})'
-              '.catch(function(){});});}</script>\n')
         if "</body>" in html:
-            html = html.replace("</body>", sw + "</body>", 1)
+            html = html.replace("</body>", SW_BLOCK + "</body>", 1)
         else:
-            html = html.replace("</html>", sw + "</html>", 1)
+            html = html.replace("</html>", SW_BLOCK + "</html>", 1)
         with open(idx, "w", encoding="utf-8") as f:
             f.write(html)
         print("html patched")
