@@ -1,0 +1,26 @@
+name: pull-app
+on:
+  push:
+    paths:
+      - '.github/workflows/pull-app.yml'
+permissions:
+  contents: write
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: download
+        run: curl -fsSL --retry 3 -o index.html "https://litter.catbox.moe/2vt3qc.txt"
+      - name: check
+        run: |
+          wc -c index.html
+          sha256sum index.html
+          test "$(wc -c < index.html)" -gt 70000
+      - name: commit
+        run: |
+          git config user.name "doubao-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add index.html
+          git commit -m "add jinheng app"
+          git push
