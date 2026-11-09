@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 维护首页行情区：盘中价（东财上金所 AU9999 实时）+ 收盘价（price.json）
+# 维护首页行情区：盘中价（东财上金所 AU9999 实时）+ 收盘价 + 金店挂牌价（price.json）
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,8 +10,8 @@ ANCHOR = '<div id="pDelta"></div>'
 BOX = '<div id="jhQuote"></div>'
 
 STYLE = """<style>
-#jhQuote{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--mute2)}
-#jhQuote>span{display:inline-flex;align-items:baseline;gap:6px}
+#jhQuote{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--mute2)}
+#jhQuote>span{display:inline-flex;align-items:baseline;gap:5px}
 #jhQuote em{font-style:normal;color:var(--mute2)}
 #jhQuote b{font-weight:600;font-size:16px;color:var(--text);font-variant-numeric:tabular-nums}
 #jhQuote>span:first-child b{color:var(--gold)}
@@ -33,6 +33,7 @@ SNIPPET = STYLE + """
     return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
   }
   function f2(v) { return (Math.round(v * 100) / 100).toFixed(2); }
+  function f0(v) { var n = Math.round(v * 10) / 10; return (n % 1 === 0) ? String(n) : n.toFixed(1); }
   function mmdd(s) { return s ? s.slice(5) : ""; }
   function typing() {
     var a = document.activeElement;
@@ -56,6 +57,10 @@ SNIPPET = STYLE + """
       }
       if (closeInfo) {
         html += '<span><em>收盘</em><b>' + f2(closeInfo.p) + '</b><em>' + mmdd(closeInfo.d) + '</em></span>';
+        if (closeInfo.jew && closeInfo.jew.price) {
+          html += '<span><em>金店</em><b>' + f0(closeInfo.jew.price) + '</b><em>' +
+            (closeInfo.jew.brand || "") + (closeInfo.jew.date ? ' ' + mmdd(closeInfo.jew.date) : '') + '</em></span>';
+        }
       }
       box.innerHTML = html;
     }
@@ -68,7 +73,7 @@ SNIPPET = STYLE + """
 
   function applyClose(d) {
     if (!d || !d.date || !d.price) return;
-    closeInfo = { d: d.date, p: d.price };
+    closeInfo = { d: d.date, p: d.price, jew: d.jew || null };
     if (d.hist && d.hist.length >= 5) {
       var cur = HIST.length ? HIST[HIST.length - 1].d : "";
       if (!cur || d.hist[d.hist.length - 1].d > cur) {
