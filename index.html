@@ -1607,14 +1607,13 @@ window.addEventListener('DOMContentLoaded',function(){ init(); });
   function apply(d) {
     try {
       if (!d || !d.date || !d.price || !window.HIST || !window.state) return;
+      var h = (d.hist && d.hist.length >= 5) ? d.hist : null;
+      if (!h) return;
       var paid = (state.manual && state.manual > 0);
-      var h = (d.hist && d.hist.length > 4) ? d.hist : null;
-      if (h) {
-        var cur = HIST.length ? HIST[HIST.length - 1].d : "";
-        if (!cur || h[h.length - 1].d > cur) {
-          HIST.length = 0;
-          for (var i = 0; i < h.length; i++) { HIST.push({ d: h[i].d, c: h[i].c }); }
-        }
+      var cur = HIST.length ? HIST[HIST.length - 1].d : "";
+      if (!cur || h[h.length - 1].d > cur) {
+        HIST.length = 0;
+        for (var i = 0; i < h.length; i++) { HIST.push({ d: h[i].d, c: h[i].c }); }
       }
       if (!paid && (!state.baseDate || d.date > state.baseDate)) {
         state.basePrice = d.price;
