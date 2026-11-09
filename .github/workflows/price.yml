@@ -2,9 +2,11 @@ name: price
 on:
   schedule:
     - cron: '20 9 * * 1-5'
+    - cron: '20 1 * * 2-6'
   push:
     paths:
       - '.github/workflows/price.yml'
+      - 'tools/update_price.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,6 +16,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
       - name: fetch close price
         run: python3 tools/update_price.py
       - name: commit
