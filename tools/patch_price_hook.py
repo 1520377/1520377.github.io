@@ -43,21 +43,20 @@ SNIPPET = """
 </script>
 """
 
+BLOCK = re.compile(r<script>\n/\* JHPRICE-HOOK \*/.*?<\/script>\n", re.S)
+
 
 def main():
     idx = os.path.join(ROOT, "index.html")
     with open(idx, "r", encoding="utf-8") as f:
         html = f.read()
 
-    block = re.compile(r"\n<script>\n\* JHPRICE-HOOK \*.*?<\/script>\n", re.S)
-
     if MARK in html:
-        if block.search(html):
-            html = block.sub(SNIPPET, html, count=1)
-            print("hook updated")
-        else:
-            print("hook marker found but pattern mismatch, abort")
-            return
+        new_html, n = BLOCK.subn(SNIPPET, html, count=1)
+        if n != 1:
+            raise SystemExit("hook marker present but block not matched")
+        html = new_html
+        print("hook updated")
     else:
         if "</body>" not in html:
             raise SystemExit("no </body> marker, abort")
