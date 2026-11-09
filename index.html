@@ -1600,5 +1600,41 @@ window.addEventListener('DOMContentLoaded',function(){ init(); });
 
 </script>
 <script>if("serviceWorker" in navigator && location.protocol === "https:"){addEventListener("load",function(){navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){});});}</script>
+
+<script>
+/* JHPRICE-HOOK */
+(function () {
+  function apply(d) {
+    try {
+      if (!d || !d.date || !d.price || !window.HIST || !window.state) return;
+      var paid = (state.manual && state.manual > 0);
+      var h = (d.hist && d.hist.length > 4) ? d.hist : null;
+      if (h) {
+        var cur = HIST.length ? HIST[HIST.length - 1].d : "";
+        if (!cur || h[h.length - 1].d > cur) {
+          HIST.length = 0;
+          for (var i = 0; i < h.length; i++) { HIST.push({ d: h[i].d, c: h[i].c }); }
+        }
+      }
+      if (!paid && (!state.baseDate || d.date > state.baseDate)) {
+        state.basePrice = d.price;
+        state.baseDate = d.date;
+      }
+      if (typeof saveLocal === "function") { saveLocal(); }
+      if (typeof renderAll === "function") { renderAll(); }
+    } catch (e) {}
+  }
+  function run() {
+    try {
+      fetch("price.json?t=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(apply)
+        .catch(function () {});
+    } catch (e) {}
+  }
+  if (document.readyState === "complete") { setTimeout(run, 200); }
+  else { window.addEventListener("load", function () { setTimeout(run, 200); }); }
+})();
+</script>
 </body>
 </html>
